@@ -14,8 +14,6 @@ env:
   PIP_DEFAULT_TIMEOUT: 60
   PIP_RETRIES: 5
 
-  DATABASE_HOST: localhost
-
   # required otherwise github api calls are rate limited
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,14 +33,13 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.14", "3.13", "3.12", "3.11", "3.10", "3.9"]
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.14", "3.13", "3.12", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: jdx/mise-action@v3
       - run: mise use python@${{ matrix.python-version }}
-      - run: docker compose up -d --wait
       - uses: iloveitaly/github-action-direnv-load-and-mask@master
       - run: uv sync
       - name: Check CLI
