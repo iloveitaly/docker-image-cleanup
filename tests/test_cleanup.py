@@ -1,7 +1,7 @@
 """Test docker image cleanup functionality."""
 
-from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock, MagicMock
+from whenever import Instant
 
 import pytest
 from docker_image_cleanup import human_size, clean_repo
@@ -20,7 +20,7 @@ def test_human_size():
 def test_clean_repo_no_images():
     client = Mock()
     client.images.list.return_value = []
-    now = datetime.now(timezone.utc)
+    now = Instant.now()
 
     result = clean_repo(client, "test/repo", 5, 30, True, now)
 
@@ -30,12 +30,12 @@ def test_clean_repo_no_images():
 
 def test_clean_repo_keeps_recent_images():
     client = Mock()
-    now = datetime.now(timezone.utc)
+    now = Instant.now()
 
     recent_img = Mock()
     recent_img.id = "img1"
     recent_img.tags = ["test/repo:latest"]
-    recent_img.attrs = {"Created": now.isoformat(), "Size": 1000000}
+    recent_img.attrs = {"Created": now.format_iso(), "Size": 1000000}
 
     client.images.list.return_value = [recent_img]
 
@@ -47,13 +47,13 @@ def test_clean_repo_keeps_recent_images():
 
 def test_clean_repo_removes_old_images():
     client = Mock()
-    now = datetime.now(timezone.utc)
-    old_date = now - timedelta(days=60)
+    now = Instant.now()
+    old_date = now.subtract(hours=60 * 24)
 
     old_img = Mock()
     old_img.id = "img1"
     old_img.tags = ["test/repo:old"]
-    old_img.attrs = {"Created": old_date.isoformat(), "Size": 1000000}
+    old_img.attrs = {"Created": old_date.format_iso(), "Size": 1000000}
 
     client.images.list.return_value = [old_img]
     client.images.get.return_value = old_img
@@ -67,13 +67,13 @@ def test_clean_repo_removes_old_images():
 
 def test_clean_repo_skips_images_in_use():
     client = Mock()
-    now = datetime.now(timezone.utc)
-    old_date = now - timedelta(days=60)
+    now = Instant.now()
+    old_date = now.subtract(hours=60 * 24)
 
     old_img = Mock()
     old_img.id = "img1"
     old_img.tags = ["test/repo:old"]
-    old_img.attrs = {"Created": old_date.isoformat(), "Size": 1000000}
+    old_img.attrs = {"Created": old_date.format_iso(), "Size": 1000000}
 
     container = Mock()
 
@@ -89,13 +89,13 @@ def test_clean_repo_skips_images_in_use():
 
 def test_clean_repo_dry_run_false():
     client = Mock()
-    now = datetime.now(timezone.utc)
-    old_date = now - timedelta(days=60)
+    now = Instant.now()
+    old_date = now.subtract(hours=60 * 24)
 
     old_img = Mock()
     old_img.id = "img1"
     old_img.tags = ["test/repo:old"]
-    old_img.attrs = {"Created": old_date.isoformat(), "Size": 1000000}
+    old_img.attrs = {"Created": old_date.format_iso(), "Size": 1000000}
 
     client.images.list.return_value = [old_img]
     client.images.get.return_value = old_img

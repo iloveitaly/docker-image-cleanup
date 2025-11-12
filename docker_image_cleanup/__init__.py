@@ -2,8 +2,7 @@ import os
 import click
 import docker
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
-from dateutil.parser import isoparse
+from whenever import Instant
 from structlog_config import configure_logger
 
 configure_logger()
@@ -28,7 +27,7 @@ def clean_repo(client, image_repo, num_recent, min_age_days, dry_run, now):
 
     sorted_images = sorted(
         images,
-        key=lambda img: isoparse(img.attrs['Created']),
+        key=lambda img: Instant.parse_iso(img.attrs['Created']),
         reverse=True
     )
 
@@ -36,9 +35,9 @@ def clean_repo(client, image_repo, num_recent, min_age_days, dry_run, now):
     for img in sorted_images[:num_recent]:
         keep_tags.update(img.tags)
 
-    min_age = now - timedelta(days=min_age_days)
+    min_age = now.subtract(hours=min_age_days * 24)
     for img in images:
-        created = isoparse(img.attrs['Created'])
+        created = Instant.parse_iso(img.attrs['Created'])
         log.debug("inspecting image", image_id=img.id, tags=img.tags, created=created)
         if created >= min_age:
             keep_tags.update(img.tags)
@@ -93,7 +92,7 @@ def clean_repo(client, image_repo, num_recent, min_age_days, dry_run, now):
 @click.option('--dry-run', is_flag=True, help='Simulate removal without executing.', show_default=True)
 def main(image_repos, num_recent, min_age_days, dry_run):
     client = docker.from_env()
-    now = datetime.now(timezone.utc)
+    now = Instant.now()
 
     grand_total = 0
     for image_repo in image_repos:

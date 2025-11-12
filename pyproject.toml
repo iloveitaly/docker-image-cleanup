@@ -8,8 +8,8 @@ requires-python = ">=3.10"
 dependencies = [
     "click>=8.3.0",
     "docker>=7.1.0",
-    "python-dateutil>=2.9.0.post0",
     "structlog-config>=0.5.0",
+    "whenever>=0.9.3",
 ]
 authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
 urls = { "Repository" = "https://github.com/iloveitaly/docker-image-cleanup" }
