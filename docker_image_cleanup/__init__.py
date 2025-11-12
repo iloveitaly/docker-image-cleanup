@@ -1,12 +1,11 @@
-import os
 import click
 import docker
+import structlog
 from collections import defaultdict
 from whenever import Instant
 from structlog_config import configure_logger
 
 configure_logger()
-import structlog
 log = structlog.get_logger()
 
 

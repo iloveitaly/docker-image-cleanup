@@ -1,9 +1,8 @@
 """Test docker image cleanup functionality."""
 
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 from whenever import Instant
 
-import pytest
 from docker_image_cleanup import human_size, clean_repo
 
 
