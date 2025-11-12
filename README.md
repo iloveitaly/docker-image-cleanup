@@ -1,8 +1,10 @@
-# Reclaim Disk Space from Docker Images
+# Clean Up Images from Self-Hosted Docker Registries
 
-If you build Docker images locally, you've probably noticed your disk filling up with old images. I built this tool to automatically clean up old Docker images while keeping the ones you actually need.
+If you're running a self-hosted Docker registry (using tools like [unregistry](https://github.com/psviderski/unregistry)), you'll want to clean up old images to reclaim disk space. This tool connects to your local Docker daemon and removes old images from specified repositories while keeping the ones you actually need.
 
 The cleanup logic is simple: keep your N most recent images and anything built in the last M days. Everything else gets removed. Images currently in use by containers are automatically skipped.
+
+This tool is designed for managing images from self-hosted registries and probably shouldn't be used for general local Docker cleanup.
 
 ## Installation
 
