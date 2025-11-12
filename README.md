@@ -1,16 +1,10 @@
-# Docker Image Cleanup
+# Clean Up Images from Self-Hosted Docker Registries
 
-Clean up old Docker images from your local Docker image store while preserving recent images and those meeting age requirements.
+If you're running a self-hosted Docker registry (using tools like [unregistry](https://github.com/psviderski/unregistry)), you'll want to clean up old images to reclaim disk space. This tool connects to your local Docker daemon and removes old images from specified repositories while keeping the ones you actually need.
 
-## Features
+The cleanup logic is simple: keep your N most recent images and anything built in the last M days. Everything else gets removed. Images currently in use by containers are automatically skipped.
 
-- Remove old Docker images based on age and recency criteria
-- Keep a configurable number of recent images
-- Preserve images newer than a specified age threshold
-- Skip images currently in use by containers
-- Dry-run mode to preview changes before execution
-- Human-readable disk space savings reporting
-- Structured logging for detailed operation visibility
+This tool is designed for managing images from self-hosted registries and probably shouldn't be used for general local Docker cleanup.
 
 ## Installation
 
@@ -26,47 +20,62 @@ uv tool install docker-image-cleanup
 
 ## Usage
 
+The basic command takes one or more image repositories:
+
 ```bash
-# Basic usage - clean a single repository
 docker-image-cleanup myrepo/myimage
+```
 
-# Clean multiple repositories
+You can clean multiple repositories at once:
+
+```bash
 docker-image-cleanup myrepo/image1 myrepo/image2
+```
 
-# Dry run to see what would be removed
+Before running the cleanup for real, use `--dry-run` to see what would be removed:
+
+```bash
 docker-image-cleanup --dry-run myrepo/myimage
+```
 
-# Keep 3 most recent images (default: 5)
+Adjust the retention policy with `--num-recent` and `--min-age-days`:
+
+```bash
+# Keep only the 3 most recent images
 docker-image-cleanup --num-recent 3 myrepo/myimage
 
-# Keep images from last 7 days (default: 30)
+# Keep images from the last 7 days
 docker-image-cleanup --min-age-days 7 myrepo/myimage
 
-# Combine options
-docker-image-cleanup --num-recent 3 --min-age-days 7 --dry-run myrepo/myimage
+# Combine both options
+docker-image-cleanup --num-recent 3 --min-age-days 7 myrepo/myimage
 ```
+
+## Features
+
+- Removes old Docker images based on age and recency criteria
+- Keeps a configurable number of recent images (default: 5)
+- Preserves images newer than a specified age threshold (default: 30 days)
+- Automatically skips images currently in use by containers
+- Dry-run mode to preview changes before execution
+- Human-readable disk space savings reporting
+- Structured logging for detailed operation visibility
 
 ## How It Works
 
-The cleanup process:
+The cleanup process is straightforward:
 
 1. Lists all images for the specified repository
-2. Identifies images to keep based on:
-   - The N most recently created images (--num-recent)
-   - Images created within the last M days (--min-age-days)
-3. Removes or untags images not meeting retention criteria
-4. Skips images currently in use by containers
+2. Identifies images to keep based on retention criteria (most recent N images and images newer than M days)
+3. Removes or untags images that don't meet retention criteria
+4. Skips any images currently in use by containers
 5. Reports total disk space saved
 
-## Options
-
-- `--num-recent`: Number of recent images to keep (default: 5)
-- `--min-age-days`: Minimum age in days to keep images (default: 30)
-- `--dry-run`: Preview what would be removed without making changes
+Images with multiple tags are handled intelligently. If all tags on an image would be removed, the entire image is deleted. If only some tags would be removed, those tags are untagged but the image remains.
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11+
 - Docker daemon running locally
 - Docker Python SDK
 
@@ -87,6 +96,4 @@ pytest
 uv run docker-image-cleanup --help
 ```
 
-## License
-
-MIT
+# [MIT License](LICENSE.md)
