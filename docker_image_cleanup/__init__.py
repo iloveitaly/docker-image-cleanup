@@ -8,7 +8,6 @@ from typing import Any
 import click
 import docker
 import docker.errors
-import structlog
 from pydantic import BaseModel, Field
 from structlog_config import configure_logger
 from whenever import Instant
@@ -45,7 +44,7 @@ def format_size(size_bytes: int) -> str:
 
 
 def parse_docker_image(
-    image_data: docker.models.images.Image, used_image_ids: set[str]
+    image_data: Any, used_image_ids: set[str] # Use Any due to pyright resolution issues with docker library types
 ) -> ImageInfo:
     """Parses docker.models.images.Image into our ImageInfo model."""
     created_instant = Instant.parse_iso(image_data.attrs["Created"])
@@ -221,7 +220,11 @@ def main(
 
         try:
             all_containers = client.containers.list(all=True)
-            used_image_ids = {container.image.id for container in all_containers}
+            used_image_ids: set[str] = {
+                container.image.id
+                for container in all_containers
+                if container.image and container.image.id
+            }
             log.debug("determined used image IDs", count=len(used_image_ids))
         except docker.errors.APIError as e:
             log.error(
