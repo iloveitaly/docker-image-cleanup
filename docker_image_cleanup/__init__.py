@@ -44,7 +44,10 @@ def format_size(size_bytes: int) -> str:
 
 
 def parse_docker_image(
-    image_data: Any, used_image_ids: set[str] # Use Any due to pyright resolution issues with docker library types
+    image_data: Any,
+    used_image_ids: set[
+        str
+    ],  # Use Any due to pyright resolution issues with docker library types
 ) -> ImageInfo:
     """Parses docker.models.images.Image into our ImageInfo model."""
     created_instant = Instant.parse_iso(image_data.attrs["Created"])
