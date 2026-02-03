@@ -45,6 +45,45 @@ docker-image-cleanup --min-age-days 7 myrepo/myimage
 docker-image-cleanup --num-recent 3 --min-age-days 7 myrepo/myimage
 ```
 
+## Docker
+
+This tool is available as a Docker image on GHCR. It's designed to run on a schedule using a built-in cron system.
+
+### Environment Variables
+
+- `TARGET_REPOS`: A space-separated list of image repositories to clean (e.g., `myrepo/image1 myrepo/image2`). **Required**.
+- `SCHEDULE`: A cron expression for the cleanup schedule (default: `0 0 * * *` - daily at midnight).
+- `NUM_RECENT`: Number of recent tags to keep (default: `5`).
+- `MIN_AGE_DAYS`: Minimum age in days to keep tags (default: `30`).
+
+### Docker Run
+
+You must mount the Docker socket so the container can interact with your local Docker daemon:
+
+```bash
+docker run -d \
+  --name docker-image-cleanup \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e TARGET_REPOS="myrepo/image1 myrepo/image2" \
+  ghcr.io/iloveitaly/docker-image-cleanup:latest
+```
+
+### Docker Compose
+
+```yaml
+services:
+  cleanup:
+    image: ghcr.io/iloveitaly/docker-image-cleanup:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TARGET_REPOS=myrepo/image1 myrepo/image2
+      - SCHEDULE=0 0 * * *
+      - NUM_RECENT=5
+      - MIN_AGE_DAYS=30
+```
+
 ## Features
 
 - Removes old Docker images based on age and recency criteria

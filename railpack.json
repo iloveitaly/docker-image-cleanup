@@ -4,6 +4,6 @@
     "github:adhocore/gronx": "latest"
   },
   "deploy": {
-    "startCommand": "tasker -file Cronfile"
+    "startCommand": "sh start.sh"
   }
 }
