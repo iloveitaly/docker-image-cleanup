@@ -9,7 +9,7 @@ dependencies = [
     "click>=8.3.0",
     "docker>=7.1.0",
     "pydantic>=2.12.5",
-    "structlog-config==0.6.0",
+    "structlog-config>=0.6.0",
     "whenever>=0.9.3",
 ]
 authors = [{ name = "Michael Bianco", email = "mike@mikebian.co" }]
@@ -20,7 +20,7 @@ urls = { "Repository" = "https://github.com/iloveitaly/docker-image-cleanup" }
 docker-image-cleanup = "docker_image_cleanup:main"
 
 [build-system]
-requires = ["uv_build>=0.8.11,<0.9.0"]
+requires = ["uv_build>=0.9.0,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -28,5 +28,10 @@ build-backend = "uv_build"
 module-root = ""
 
 [dependency-groups]
-dev = ["pytest>=8.3.3","pyright>=1.1.380","ruff>=0.8.0"]
+dev = ["pytest>=8.3.3", "pyright[nodejs]>=1.1.380", "ruff>=0.8.0"]
 
+[tool.pyright]
+exclude = ["examples/", "playground/", "tmp/", ".venv/", "tests/"]
+
+[tool.ruff]
+extend-exclude = ["playground.py", "playground/"]

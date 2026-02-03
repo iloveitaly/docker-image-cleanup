@@ -2,26 +2,18 @@
 Cleans up old Docker images from local storage with retention controls.
 """
 
+from collections import defaultdict
+from typing import Any
+
 import click
 import docker
 import docker.errors
 import structlog
-from collections import defaultdict
-from typing import Any
-
 from pydantic import BaseModel, Field
+from structlog_config import configure_logger
 from whenever import Instant
 
-try:
-    from structlog_config import configure_logger
-
-    configure_logger()
-    log = structlog.get_logger(__name__)
-except ImportError:
-    import logging
-
-    logging.basicConfig(level=logging.INFO)
-    log = logging.getLogger(__name__)
+log = configure_logger()
 
 
 class CleanupConfig(BaseModel):
@@ -271,7 +263,9 @@ def main(
                 else "grand total space saved"
             )
             log.info(
-                result_msg, bytes=grand_total_saved, human=format_size(grand_total_saved)
+                result_msg,
+                bytes=grand_total_saved,
+                human=format_size(grand_total_saved),
             )
 
     except docker.errors.DockerException as e:
