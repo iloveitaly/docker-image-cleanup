@@ -9,12 +9,6 @@ This tool is designed for managing images from self-hosted registries and probab
 ## Installation
 
 ```bash
-pip install docker-image-cleanup
-```
-
-Or using `uv`:
-
-```bash
 uv tool install docker-image-cleanup
 ```
 
