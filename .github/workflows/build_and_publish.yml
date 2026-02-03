@@ -16,15 +16,14 @@ env:
 
   # required otherwise github api calls are rate limited
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_ENV: ci
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v3
-        env:
-          MISE_ENV: ci
       - uses: iloveitaly/github-action-direnv-load-and-mask@master
       - run: uv sync
       - run: just lint
@@ -37,7 +36,7 @@ jobs:
         python-version: ["3.14", "3.13", "3.12", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v3
       - run: mise use python@${{ matrix.python-version }}
       - uses: iloveitaly/github-action-direnv-load-and-mask@master
@@ -51,13 +50,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
+    permissions:
+      contents: write
+      issues: write
+      # NOTE this permission requires configuration to be set on the repo, check `just github_repo_permissions_create`
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: python
-          token: ${{ secrets.GH_PERSONAL_TOKEN }}
 
   build-and-publish:
     needs: release-please
@@ -67,7 +70,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: jdx/mise-action@v3
       - uses: iloveitaly/github-action-direnv-load-and-mask@master
       - run: uv sync
