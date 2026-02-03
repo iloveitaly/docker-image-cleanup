@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.1...v0.1.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* allow SCHEDULE to be customized in docker deployment ([df01e86](https://github.com/iloveitaly/docker-image-cleanup/commit/df01e86a39ec27368d03d5dd9caf952bad31eaed))
+
 ## [0.1.1](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.0...v0.1.1) (2026-02-03)
 
 

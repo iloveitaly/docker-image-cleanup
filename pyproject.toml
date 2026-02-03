@@ -1,6 +1,6 @@
 [project]
 name = "docker-image-cleanup"
-version = "0.1.1"
+version = "0.1.2"
 description = "Clean up old Docker images from local storage with retention controls"
 keywords = ["docker", "cleanup", "images", "disk-space"]
 readme = "README.md"
