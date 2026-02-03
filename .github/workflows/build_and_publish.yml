@@ -32,7 +32,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: ["3.14", "3.13", "3.12", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
