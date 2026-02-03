@@ -73,27 +73,4 @@ The cleanup process is straightforward:
 
 Images with multiple tags are handled intelligently. If all tags on an image would be removed, the entire image is deleted. If only some tags would be removed, those tags are untagged but the image remains.
 
-## Requirements
-
-- Python 3.11+
-- Docker daemon running locally
-- Docker Python SDK
-
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/iloveitaly/docker-image-cleanup
-cd docker-image-cleanup
-
-# Install dependencies
-uv sync
-
-# Run tests
-pytest
-
-# Run the CLI
-uv run docker-image-cleanup --help
-```
-
 # [MIT License](LICENSE.md)
