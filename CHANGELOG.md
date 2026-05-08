@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.4](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.3...v0.1.4) (2026-05-08)
+
+
+### Bug Fixes
+
+* track image size during deletion for better accuracy ([648d84a](https://github.com/iloveitaly/docker-image-cleanup/commit/648d84a2b41d1d1aaede7214915b8f09a1f9062f))
+
+
+### Documentation
+
+* Remove unnecessary line from README ([21424c1](https://github.com/iloveitaly/docker-image-cleanup/commit/21424c1cb2be3a78dcd242e7d0c0cb537cff1a86))
+* update developer instructions and command documentation ([344f5e0](https://github.com/iloveitaly/docker-image-cleanup/commit/344f5e00801a9a4e9164948242fe2a4d0d0e5e51))
+
 ## [0.1.3](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.2...v0.1.3) (2026-05-08)
 
 
