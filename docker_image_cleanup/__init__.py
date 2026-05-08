@@ -50,9 +50,25 @@ def parse_docker_image(
     used_image_ids: set[
         str
     ],  # Use Any due to pyright resolution issues with docker library types
-) -> ImageInfo:
-    """Parses docker.models.images.Image into our ImageInfo model."""
-    created_instant = Instant.parse_iso(image_data.attrs["Created"])
+) -> ImageInfo | None:
+    """Parses docker.models.images.Image into our ImageInfo model.
+
+    Returns None if the creation date cannot be determined.
+    """
+    created_str = image_data.attrs.get("Created")
+    if not created_str:
+        metadata = image_data.attrs.get("Metadata") or {}
+        created_str = metadata.get("LastTagTime")
+
+    if not created_str or created_str == "0001-01-01T00:00:00Z":
+        log.warning(
+            "could not determine image age, skipping",
+            image_id=image_data.id,
+            tags=image_data.tags,
+        )
+        return None
+
+    created_instant = Instant.parse_iso(created_str)
     image_id = image_data.id
 
     return ImageInfo(
@@ -73,7 +89,11 @@ def get_images_to_process(
         log.info("no images found for repository", repo=repo_name)
         return []
 
-    parsed_images = [parse_docker_image(img, used_image_ids) for img in images]
+    parsed_images = [
+        parsed
+        for img in images
+        if (parsed := parse_docker_image(img, used_image_ids)) is not None
+    ]
     return sorted(parsed_images, key=lambda img: img.created, reverse=True)
 
 

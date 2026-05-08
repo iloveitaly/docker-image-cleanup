@@ -13,6 +13,7 @@ from docker_image_cleanup import (
     execute_cleanup,
     format_size,
     get_images_to_process,
+    parse_docker_image,
 )
 
 
@@ -265,3 +266,54 @@ def test_execute_cleanup_skips_untagging_on_api_error():
     client.images.remove.assert_any_call("repo:tag1", force=False)
     client.images.remove.assert_any_call("repo:tag2", force=False)
     assert client.images.remove.call_count == 2
+
+
+def test_parse_docker_image_fallbacks():
+    """Tests parse_docker_image with missing or invalid Created attribute."""
+    # Case 1: Missing Created, has Metadata.LastTagTime
+    mock_img = Mock(spec=Image)
+    mock_img.id = "sha256:fallback"
+    mock_img.tags = ["test:tag"]
+    last_tag_time = "2023-01-01T12:00:00Z"
+    mock_img.attrs = {
+        "Metadata": {"LastTagTime": last_tag_time},
+        "Size": 100,
+    }
+
+    info = parse_docker_image(mock_img, set())
+    assert info is not None
+    assert info.created == Instant.parse_iso(last_tag_time)
+
+    # Case 2: Missing Created, Missing Metadata (or None), returns None
+    mock_img.attrs = {"Size": 100}
+    info = parse_docker_image(mock_img, set())
+    assert info is None
+
+    # Case 3: Created is "0001-01-01T00:00:00Z", returns None
+    mock_img.attrs = {"Created": "0001-01-01T00:00:00Z", "Size": 100}
+    info = parse_docker_image(mock_img, set())
+    assert info is None
+
+
+def test_get_images_to_process_filters_unparsable():
+    """Tests that get_images_to_process filters out images with missing Created info."""
+    client = Mock()
+    now = Instant.now()
+
+    # Image 1: Valid
+    mock_img_1 = Mock(spec=Image)
+    mock_img_1.id = "sha256:valid"
+    mock_img_1.tags = ["repo:v1"]
+    mock_img_1.attrs = {"Created": now.format_iso(), "Size": 100}
+
+    # Image 2: Invalid (Missing Created and Metadata)
+    mock_img_2 = Mock(spec=Image)
+    mock_img_2.id = "sha256:invalid"
+    mock_img_2.tags = ["repo:v2"]
+    mock_img_2.attrs = {"Size": 200}
+
+    client.images.list.return_value = [mock_img_1, mock_img_2]
+    images = get_images_to_process(client, "repo", set())
+
+    assert len(images) == 1
+    assert images[0].id == "sha256:valid"
