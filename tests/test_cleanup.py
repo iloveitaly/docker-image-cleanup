@@ -99,7 +99,7 @@ def test_determine_cleanup_actions_keep_recent():
 
     actions = determine_cleanup_actions(images, config, now, "repo")
 
-    assert actions["images_to_delete"] == []
+    assert actions["images_to_delete"] == {}
     assert actions["tags_to_remove"] == []
     assert actions["total_size_saved"] == 0
 
@@ -131,7 +131,7 @@ def test_determine_cleanup_actions_keep_old_but_recent_enough():
 
     actions = determine_cleanup_actions(images, config, now, "repo")
 
-    assert actions["images_to_delete"] == ["img3"]
+    assert actions["images_to_delete"] == {"img3": 300}
     assert actions["tags_to_remove"] == ["repo:v1"]
     assert actions["total_size_saved"] == 300
 
@@ -153,7 +153,7 @@ def test_determine_cleanup_actions_remove_all_tags_but_in_use():
 
     actions = determine_cleanup_actions(images, config, now, "repo")
 
-    assert actions["images_to_delete"] == []
+    assert actions["images_to_delete"] == {}
     assert set(actions["tags_to_remove"]) == {"repo:latest", "repo:v1"}
     assert actions["total_size_saved"] == 0
 
@@ -205,7 +205,7 @@ def test_determine_cleanup_actions_remove_multiple_images_and_tags():
 def test_execute_cleanup_dry_run():
     """Tests execute_cleanup in dry_run mode."""
     client = Mock()
-    images_to_delete = ["img_to_delete_id"]
+    images_to_delete = {"img_to_delete_id": 500000}
     tags_to_remove = ["repo:old-tag"]
     total_size_saved = 500000
 
@@ -230,7 +230,7 @@ def test_execute_cleanup_removes_tag_and_image():
     client.images.get.return_value = img_to_delete
     client.images.remove.return_value = None
 
-    images_to_delete = ["img_to_delete_id"]
+    images_to_delete = {"img_to_delete_id": 500000}
     tags_to_remove = ["repo:old-tag"]
     total_size_saved = 500000
 
@@ -255,7 +255,7 @@ def test_execute_cleanup_skips_untagging_on_api_error():
 
     client.images.remove.side_effect = remove_side_effect
 
-    images_to_delete = []
+    images_to_delete = {}
     tags_to_remove = ["repo:tag1", "repo:tag2"]
     total_size_saved = 0
 
@@ -317,3 +317,51 @@ def test_get_images_to_process_filters_unparsable():
 
     assert len(images) == 1
     assert images[0].id == "sha256:valid"
+
+
+def test_execute_cleanup_handles_image_already_removed_by_untagging():
+    """Tests that execute_cleanup counts size when ImageNotFound is raised (auto-deleted)."""
+    client = Mock()
+
+    def remove_side_effect(tag_or_id, force=False):
+        if tag_or_id == "img_to_delete_id":
+            raise docker.errors.ImageNotFound("Simulated ImageNotFound")
+        return None
+
+    client.images.remove.side_effect = remove_side_effect
+
+    images_to_delete = {"img_to_delete_id": 1000}
+    tags_to_remove = ["repo:old-tag"]
+    total_size_saved = 1000
+
+    result = execute_cleanup(
+        client, images_to_delete, tags_to_remove, total_size_saved, dry_run=False
+    )
+
+    assert result == 1000
+    client.images.remove.assert_any_call("repo:old-tag", force=False)
+    client.images.remove.assert_any_call("img_to_delete_id", force=False)
+
+
+def test_execute_cleanup_skips_image_removal_on_api_error():
+    """Tests that execute_cleanup skips size counting when APIError is raised on image removal."""
+    client = Mock()
+
+    def remove_side_effect(tag_or_id, force=False):
+        if tag_or_id == "img_to_delete_id":
+            raise docker.errors.APIError("Simulated API error")
+        return None
+
+    client.images.remove.side_effect = remove_side_effect
+
+    images_to_delete = {"img_to_delete_id": 1000}
+    tags_to_remove = ["repo:old-tag"]
+    total_size_saved = 1000
+
+    result = execute_cleanup(
+        client, images_to_delete, tags_to_remove, total_size_saved, dry_run=False
+    )
+
+    assert result == 0
+    client.images.remove.assert_any_call("repo:old-tag", force=False)
+    client.images.remove.assert_any_call("img_to_delete_id", force=False)

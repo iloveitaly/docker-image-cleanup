@@ -113,7 +113,7 @@ def determine_cleanup_actions(
         if img.created >= min_age_threshold:
             keep_tags.update(img.tags)
 
-    images_to_delete_ids: set[str] = set()
+    images_to_delete: dict[str, int] = {}
     tags_to_remove: list[str] = []
 
     images_by_id: dict[str, list[ImageInfo]] = defaultdict(list)
@@ -142,7 +142,7 @@ def determine_cleanup_actions(
             if set(tags_for_this_image_to_remove) == current_image_repo_tags:
                 img_info = img_list[0]
                 if not img_info.is_in_use:
-                    images_to_delete_ids.add(img_id)
+                    images_to_delete[img_id] = img_info.size
                     total_size_saved += img_info.size
                 else:
                     log.warning(
@@ -152,7 +152,7 @@ def determine_cleanup_actions(
                     )
 
     return {
-        "images_to_delete": list(images_to_delete_ids),
+        "images_to_delete": images_to_delete,
         "tags_to_remove": list(set(tags_to_remove)),
         "total_size_saved": total_size_saved,
     }
@@ -160,7 +160,7 @@ def determine_cleanup_actions(
 
 def execute_cleanup(
     client: docker.DockerClient,
-    images_to_delete: list[str],
+    images_to_delete: dict[str, int],
     tags_to_remove: list[str],
     total_size_saved: int,
     dry_run: bool,
@@ -172,7 +172,7 @@ def execute_cleanup(
         if tags_to_remove:
             log.info("would remove tags", tags=tags_to_remove)
         if images_to_delete:
-            log.info("would remove images", image_ids=images_to_delete)
+            log.info("would remove images", image_ids=list(images_to_delete.keys()))
 
         log.info(
             "total space that would be saved",
@@ -188,15 +188,19 @@ def execute_cleanup(
         except docker.errors.APIError as e:
             log.warning("skipped tag removal", tag=tag, reason=str(e))
 
-    for img_id in images_to_delete:
+    # We explicitly remove the Image ID here even after untagging.
+    # This is primarily to catch and clean up "dangling" images (images with no tags)
+    # that might have been orphaned but wouldn't be caught by the tag loop.
+    for img_id, size in images_to_delete.items():
         try:
-            img = client.images.get(img_id)
-            size = img.attrs.get("Size", 0)
             client.images.remove(img_id, force=False)
             log.info("removed image", image_id=img_id, size=format_size(size))
             executed_size_saved += size
         except docker.errors.ImageNotFound:
-            log.warning("image already removed", image_id=img_id)
+            # If the image is not found here, it means Docker automatically deleted 
+            # the underlying image data when we removed its last tag in the loop above.
+            log.info("image removed via untagging", image_id=img_id, size=format_size(size))
+            executed_size_saved += size
         except docker.errors.APIError as e:
             log.warning("skipped image removal", image_id=img_id, reason=str(e))
 
