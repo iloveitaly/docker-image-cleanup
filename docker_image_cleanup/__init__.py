@@ -184,9 +184,9 @@ def execute_cleanup(
     for tag in tags_to_remove:
         try:
             client.images.remove(tag, force=False)
-            log.info("untagged image", tag=tag)
+            log.info("removed tag", tag=tag)
         except docker.errors.APIError as e:
-            log.warning("skipped untagging", tag=tag, reason=str(e))
+            log.warning("skipped tag removal", tag=tag, reason=str(e))
 
     for img_id in images_to_delete:
         try:
