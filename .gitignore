@@ -134,3 +134,19 @@ dmypy.json
 
 # i like having temporary files specified locally vs globally
 tmp/
+
+# START AI INSTRUCTION IGNORES
+/.claude/commands/write-or-update-readme.md
+/.claude/rules/general.md
+/.claude/rules/python.md
+/.cursor/commands/write-or-update-readme.md
+/.cursor/rules/general.mdc
+/.cursor/rules/python.mdc
+/.gemini/commands/write-or-update-readme.toml
+/.github/copilot-instructions.md
+/.github/instructions/python.instructions.md
+/.github/prompts/write-or-update-readme.prompt.md
+/.opencode/commands/write-or-update-readme.md
+/AGENTS.md
+/GEMINI.md
+# END AI INSTRUCTION IGNORES
