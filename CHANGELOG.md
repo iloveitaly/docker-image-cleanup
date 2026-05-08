@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.2...v0.1.3) (2026-05-08)
+
+
+### Bug Fixes
+
+* handle missing or invalid image creation timestamps ([93c0948](https://github.com/iloveitaly/docker-image-cleanup/commit/93c0948dbee95fa1ac398ab1c5b7445f2fdd16e8))
+
 ## [0.1.2](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.1...v0.1.2) (2026-02-03)
 
 
