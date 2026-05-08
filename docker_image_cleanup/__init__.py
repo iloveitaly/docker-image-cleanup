@@ -197,9 +197,11 @@ def execute_cleanup(
             log.info("removed image", image_id=img_id, size=format_size(size))
             executed_size_saved += size
         except docker.errors.ImageNotFound:
-            # If the image is not found here, it means Docker automatically deleted 
+            # If the image is not found here, it means Docker automatically deleted
             # the underlying image data when we removed its last tag in the loop above.
-            log.info("image removed via untagging", image_id=img_id, size=format_size(size))
+            log.info(
+                "image removed via untagging", image_id=img_id, size=format_size(size)
+            )
             executed_size_saved += size
         except docker.errors.APIError as e:
             log.warning("skipped image removal", image_id=img_id, reason=str(e))
