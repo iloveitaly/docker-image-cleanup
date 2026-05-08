@@ -73,6 +73,18 @@ docker run -d \
   ghcr.io/iloveitaly/docker-image-cleanup:latest
 ```
 
+Here's an example script to get the latest image and restart any existing docker image:
+
+```
+docker pull ghcr.io/iloveitaly/docker-image-cleanup:latest
+docker stop docker-image-cleanup && docker rm docker-image-cleanup
+docker run -d \
+  --name docker-image-cleanup \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e TARGET_REPOS="repo.com/one repo.com/two" \
+  ghcr.io/iloveitaly/docker-image-cleanup:latest
+```
+
 ### Docker Compose
 
 ```yaml
