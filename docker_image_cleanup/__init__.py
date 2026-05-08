@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 from structlog_config import configure_logger
 from whenever import Instant
 
+from .version import __version__ as __version__
+
 log = configure_logger()
 
 

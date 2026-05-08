@@ -1,3 +1,8 @@
+[![Release Notes](https://img.shields.io/github/release/iloveitaly/docker-image-cleanup)](https://github.com/iloveitaly/docker-image-cleanup/releases)
+[![Downloads](https://static.pepy.tech/badge/docker-image-cleanup/month)](https://pepy.tech/project/docker-image-cleanup)
+![GitHub CI Status](https://github.com/iloveitaly/docker-image-cleanup/actions/workflows/build_and_publish.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # Clean Up Images from Self-Hosted Docker Registries
 
 If you're running a self-hosted Docker registry (using tools like [unregistry](https://github.com/psviderski/unregistry)), you'll want to clean up old images to reclaim disk space. This tool connects to your local Docker daemon and removes old images from specified repositories while keeping the ones you actually need.
@@ -107,3 +112,8 @@ The cleanup process is straightforward:
 Images with multiple tags are handled intelligently. If all tags on an image would be removed, the entire image is deleted. If only some tags would be removed, those tags are untagged but the image remains.
 
 # [MIT License](LICENSE.md)
+
+---
+
+*This project was created from [iloveitaly/python-package-template](https://github.com/iloveitaly/python-package-template)*
+> theirs

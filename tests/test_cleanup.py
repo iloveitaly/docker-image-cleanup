@@ -1,18 +1,19 @@
 """Test docker image cleanup functionality."""
 
 from unittest.mock import Mock
+
 import docker.errors
+from docker.models.images import Image
 from whenever import Instant
 
 from docker_image_cleanup import (
-    format_size,
-    get_images_to_process,
+    CleanupConfig,
+    ImageInfo,
     determine_cleanup_actions,
     execute_cleanup,
-    ImageInfo,
-    CleanupConfig,
+    format_size,
+    get_images_to_process,
 )
-from docker.models.images import Image
 
 
 def test_format_size():
