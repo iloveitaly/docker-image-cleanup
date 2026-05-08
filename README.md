@@ -116,4 +116,3 @@ Images with multiple tags are handled intelligently. If all tags on an image wou
 ---
 
 *This project was created from [iloveitaly/python-package-template](https://github.com/iloveitaly/python-package-template)*
-> theirs
