@@ -270,6 +270,13 @@ def main(
             dry_run=dry_run,
         )
 
+        log.info(
+            "cleanup configuration",
+            num_recent=config.num_recent,
+            min_age_days=config.min_age_days,
+            dry_run=config.dry_run,
+        )
+
         grand_total_saved = 0
         for repo_name in image_repos:
             log.info("processing repository", repo=repo_name)
