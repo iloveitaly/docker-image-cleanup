@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.4...v0.2.0) (2026-05-13)
+
+
+### Features
+
+* log cleanup configuration settings ([48412c7](https://github.com/iloveitaly/docker-image-cleanup/commit/48412c772d9f642d69fc965a2b46b2ccdf717bbe))
+
+
+### Documentation
+
+* Add example script for docker image management ([4249dbd](https://github.com/iloveitaly/docker-image-cleanup/commit/4249dbdb7563b9445ff6ad2990000059649851f8))
+
 ## [0.1.4](https://github.com/iloveitaly/docker-image-cleanup/compare/v0.1.3...v0.1.4) (2026-05-08)
 
 
