@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 """
 Cleans up old Docker images from local storage with retention controls.
 """
 
+import sys
 from collections import defaultdict
 from typing import Any
 
@@ -311,10 +313,10 @@ def main(
 
     except docker.errors.DockerException as e:
         log.error("failed to connect to Docker daemon", reason=str(e))
-        exit(1)
+        sys.exit(1)
     except Exception:
         log.exception("an unexpected error occurred")
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
