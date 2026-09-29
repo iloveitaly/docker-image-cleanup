@@ -251,7 +251,6 @@ def test_execute_cleanup_skips_untagging_on_api_error():
     def remove_side_effect(tag_or_id, force=False):
         if tag_or_id == "repo:tag1":
             raise docker.errors.APIError("Simulated API error")
-        return None
 
     client.images.remove.side_effect = remove_side_effect
 
@@ -326,7 +325,6 @@ def test_execute_cleanup_handles_image_already_removed_by_untagging():
     def remove_side_effect(tag_or_id, force=False):
         if tag_or_id == "img_to_delete_id":
             raise docker.errors.ImageNotFound("Simulated ImageNotFound")
-        return None
 
     client.images.remove.side_effect = remove_side_effect
 
@@ -350,7 +348,6 @@ def test_execute_cleanup_skips_image_removal_on_api_error():
     def remove_side_effect(tag_or_id, force=False):
         if tag_or_id == "img_to_delete_id":
             raise docker.errors.APIError("Simulated API error")
-        return None
 
     client.images.remove.side_effect = remove_side_effect
 
