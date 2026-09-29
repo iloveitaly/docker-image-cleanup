@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Cleans up old Docker images from local storage with retention controls.
 """
